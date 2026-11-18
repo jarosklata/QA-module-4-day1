@@ -9,7 +9,7 @@
 ```
 
 <p align="center">
-  <img src="robot.svg" alt="Robot mascot saying print hi" width="220">
+  <img src="robot.svg" alt="Robot mascot saying print hi" width="290">
 </p>
 
 <p align="center">
