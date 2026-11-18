@@ -1,0 +1,10 @@
+Open github.com and create new personal account using either
+temporary or non-important email address.
+
+If you already have an account there, we still recommend you
+to create new one - just to make sure you don't accidentally
+delete something from your existing (live) account.
+
+Once created new account, sign into it - but make sure you do
+it in your VM (NOT ON YOUR HOST PC). Save the password in the
+browser for your convenience, and keep that browser tab open.

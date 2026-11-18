@@ -1,0 +1,35 @@
+If you already downloaded PyCharm 2026, continue to the next step.
+If not:
+ - open https://www.jetbrains.com/pycharm/download/ and download pycharm, or here is
+   direct download link: https://download.jetbrains.com/python/pycharm-2026.2.3.exe
+ - save the file to the Desktop of your VM (NOT YOUR HOST PC)
+
+
+Run pycharm-2026.2.3.exe
+Click Next
+Uninstall old version:
+ - TICK 'PyCharm Community Edition 2024'
+ - KEEP UNTICKED 'Uninstall silently'
+ - Click Next
+Uninstall PyCharm Community Edition:
+ - TICK 'Delete PyCharm... caches and local history'
+ - TICK 'Delete PyCharm... settings and installed plugins'
+ - KEEP UNTICKED 'Share the uninstall feedback'
+ - Click Uninstall
+<Uninstalling - about 1 min>
+Click Close
+Choose Install Location:
+ - SKIP THIS: Change Destination Folder to "C:\Program Files\PyCharm 2026.2.3"
+ - Click Next
+Installation Options:
+ - Create Desktop Shortcut: TICK 'PyCharm'
+ - Update PATH Variable: TICK 'Add "bin" folder to the PATH'
+ - Create Assosiations: TICK all except for txt (py, ipynb, yaml, yml, md, json)
+ - Click Next
+Click Install
+<Installing - about 4 mins>
+TICK 'Run PyCharm', click Finish
+TICK 'I confirm', click Continue
+OPTIONAL: Theme: Islands Light
+OPTIONAL: Click Menu button (four-lines icon in the top left corner) -
+          View - Appearance - Main Menu - Show above Main Toolbar

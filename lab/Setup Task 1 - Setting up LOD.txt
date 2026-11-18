@@ -1,0 +1,34 @@
+1. LAUNCH LOD (aka Virtual Machine)
+   Open https://qa.learnondemand.net
+    - if you       have an account: sign in and click 'Redeem Training Key'
+    - if you don't have an account: click 'Register with Training Key'
+
+   We recommend using your work email address.
+   Training Key has been shared by your tutor in the webex chat.
+
+   Once you redeemed training key, you will see new lab in your account:
+   click on today's date in the calendar, scroll down, and click 'Launch' button
+
+   You should get message 'Your lab environment is being built'. Wait for lab
+   to start (usually less than 2 minutes) - and you should see Windows Desktop
+
+
+2. ACCESS D: DRIVE
+   On the side panel, click 'Resources' link (next to 'Instructions')
+   Click the drop-down under 'DVD Drive' and select 'M4B' instead of 'No Media'.
+   Open Windows Explorer (make sure you do it in your LOD - NOT YOUR HOST PC)
+   and navigate to D: drive - you should see some files such as 'sales_messy.csv'
+
+
+3. DOWNLOAD PYCHARM
+   Open web browser (make sure you do in inside VM - not your host PC), navigate to
+   https://download.jetbrains.com/python/pycharm-2026.2.3.exe
+   and save the file to the Desktop (but don't run it yet)
+   IMPROTANT: Make sure you saved this file to your VM - NOT TO YOUR HOST PC
+
+
+
+EXPECTED OUTCOMES:
+ - your virtual machine (LOD) is running
+ - content of D: drive is available in Windows Explorer
+ - file pycharm-2026.2.3.exe saved to the Desktop of your VM
