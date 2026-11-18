@@ -1,0 +1,40 @@
+Enter a TV show search term: Show name: Sherlock
+Genre    : Drama, Crime, Mystery
+Rating   : 8.9
+------------------------------
+Show name: Young Sherlock
+Genre    : Action, Crime, Mystery
+Rating   : 7.3
+------------------------------
+Show name: Miss Sherlock
+Genre    : Drama, Crime, Mystery
+Rating   : 7.3
+------------------------------
+Show name: Sherlock Holmes
+Genre    : Drama, Crime, Mystery
+Rating   : No rating
+------------------------------
+Show name: Blind Sherlock
+Genre    : Crime, Thriller
+Rating   : No rating
+------------------------------
+Show name: Sherlock Holmes
+Genre    : Drama, Crime, Mystery
+Rating   : No rating
+------------------------------
+Show name: Sherlock Hound
+Genre    : Action, Adventure, Anime
+Rating   : No rating
+------------------------------
+Show name: Kabukichou Sherlock
+Genre    : Drama, Comedy, Anime, Mystery
+Rating   : No rating
+------------------------------
+Show name: Young Sherlock
+Genre    : Drama, Mystery, History
+Rating   : No rating
+------------------------------
+Show name: Sherlock Uncovered
+Genre    : Unknown
+Rating   : No rating
+------------------------------

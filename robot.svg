@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="290" height="170" viewBox="0 0 290 170" role="img" aria-label="Robot mascot saying print hi">
+  <!-- antenna -->
+  <line x1="80" y1="14" x2="80" y2="34" stroke="#2d4a3e" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="80" cy="12" r="7" fill="#f2a65a"/>
+  <!-- head -->
+  <rect x="26" y="34" width="108" height="98" rx="20" fill="#8ccab0" stroke="#2d4a3e" stroke-width="4"/>
+  <!-- eyes -->
+  <circle cx="58" cy="72" r="12" fill="#2d4a3e"/>
+  <circle cx="102" cy="72" r="12" fill="#2d4a3e"/>
+  <circle cx="62" cy="68" r="4" fill="#ffffff"/>
+  <circle cx="106" cy="68" r="4" fill="#ffffff"/>
+  <!-- smile -->
+  <path d="M56 104 Q80 122 104 104" fill="none" stroke="#2d4a3e" stroke-width="5" stroke-linecap="round"/>
+  <!-- body -->
+  <rect x="44" y="136" width="72" height="20" rx="7" fill="#f2a65a" stroke="#2d4a3e" stroke-width="3"/>
+  <!-- speech bubble -->
+  <path d="M146 24 H262 a6 6 0 0 1 6 6 V52 a6 6 0 0 1 -6 6 H160 L148 68 V58 H146 a6 6 0 0 1 -6 -6 V30 a6 6 0 0 1 6 -6 Z" fill="#ffffff" stroke="#2d4a3e" stroke-width="2.5"/>
+  <text x="154" y="46" font-family="Menlo, Consolas, monospace" font-size="13" fill="#2d4a3e">print("hi")</text>
+</svg>
