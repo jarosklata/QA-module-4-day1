@@ -8,8 +8,9 @@ Serves the single-page site (index.html) and these JSON endpoints:
     GET /api/football?league=sco.1&team=Celtic&date=20261121
                                         football matches (Day 4 workshop);
                                         team and date are optional
-    GET /api/modules                   list of the Module 1-8 lab files
-    GET /api/module-file?path=...       text of one listed lab file
+    GET /api/modules                    list of the Module 1-8 lab files
+    GET /api/solutions                  list of the module solution files
+    GET /api/module-file?path=...       text of one listed lab or solution file
 
 Uses only the Python standard library. Run it with:
 
@@ -41,7 +42,7 @@ sys.path.insert(0, str(WEB_DIR))
 
 from football_monitor import ApiError as FootballApiError  # noqa: E402
 from football_monitor import fetch_scoreboard, filter_by_team, league_name, parse_matches  # noqa: E402
-from modules import MODULES, allowed_paths  # noqa: E402
+from modules import MODULES, SOLUTIONS, allowed_paths  # noqa: E402
 from postcode_lookup import PostcodeError, PostcodeNotFound, load_postcodes, lookup_postcode  # noqa: E402
 from weather import WeatherError, get_weather_for_place  # noqa: E402
 
@@ -71,6 +72,8 @@ class SiteRequestHandler(BaseHTTPRequestHandler):
             )
         elif parsed.path == "/api/modules":
             self.send_json(200, MODULES)
+        elif parsed.path == "/api/solutions":
+            self.send_json(200, SOLUTIONS)
         elif parsed.path == "/api/module-file":
             self.send_module_file(query.get("path", [""])[0])
         else:

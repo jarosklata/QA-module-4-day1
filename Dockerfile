@@ -16,6 +16,7 @@ COPY DAY1-Labs ./DAY1-Labs
 COPY Optional/Optional-Task-2/weather.py ./Optional/Optional-Task-2/weather.py
 COPY Optional/Optional-Task-3/postcode_lookup.py ./Optional/Optional-Task-3/postcode_lookup.py
 COPY Optional/Optional-Task-3/data ./Optional/Optional-Task-3/data
+COPY DAY4-Workshop/module-solutions ./DAY4-Workshop/module-solutions
 COPY DAY4-Workshop/football-monitor/part8-documentation/football_monitor.py ./DAY4-Workshop/football-monitor/part8-documentation/football_monitor.py
 
 RUN useradd --system --no-create-home app

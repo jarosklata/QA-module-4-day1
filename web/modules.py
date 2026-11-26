@@ -80,7 +80,62 @@ MODULES = [
     },
 ]
 
+# The module solutions from the exercise guide, section 3. The numbering follows
+# the guide: its "Module 1 solution" answers the guide's Module 2 lab, and so on.
+_SOLUTIONS_DIR = "DAY4-Workshop/module-solutions"
+
+
+def _solution(number, title, topic, files):
+    folder = f"{_SOLUTIONS_DIR}/module{number}-solution"
+    return {
+        "number": number,
+        "title": title,
+        "topic": topic,
+        "files": [{"path": f"{folder}/{name}", "label": label} for name, label in files],
+    }
+
+
+SOLUTIONS = [
+    _solution(1, "Define an automation solution", "The completed automation planning worksheet.", [
+        ("solution.md", "Solution"),
+    ]),
+    _solution(2, "Generate your first automation script", "Two prompts and the scripts they produce.", [
+        ("solution.md", "Solution"),
+        ("tv_show_search_v1.py", "Script from prompt 1"),
+        ("tv_show_search_v2.py", "Improved script (prompt 2)"),
+    ]),
+    _solution(3, "Improve AI-generated code", "A hard-to-maintain script, and a cleaner version.", [
+        ("solution.md", "Solution"),
+        ("original_script.py", "Original script"),
+        ("improved_script.py", "Improved script"),
+    ]),
+    _solution(4, "Retrieve TV show data", "Calling the TVMaze API and showing name, genres and rating.", [
+        ("solution.md", "Solution"),
+        ("tvmaze_search.py", "TVMaze script"),
+    ]),
+    _solution(5, "Externalise configuration", "Reading the search term and minimum rating from config.json.", [
+        ("solution.md", "Solution"),
+        ("tvmaze_search.py", "TVMaze script"),
+        ("config.json", "Configuration"),
+    ]),
+    _solution(6, "Test and break the automation", "A test table, the problems it found, and the improved script.", [
+        ("solution.md", "Solution"),
+        ("tvmaze_search.py", "Improved script"),
+        ("config.json", "Configuration"),
+    ]),
+    _solution(7, "Prepare for workplace use", "Adding logging and a report file.", [
+        ("solution.md", "Solution"),
+        ("tvmaze_search.py", "Script with logging"),
+        ("config.json", "Configuration"),
+    ]),
+]
+
 
 def allowed_paths():
     """Return the set of file paths the server may read."""
-    return {item["path"] for module in MODULES for item in module["files"]}
+    return {
+        item["path"]
+        for group in (MODULES, SOLUTIONS)
+        for module in group
+        for item in module["files"]
+    }
