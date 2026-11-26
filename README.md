@@ -21,7 +21,7 @@ AI-ASSISTED SCRIPTING
 
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.7%2B-blue?logo=python&logoColor=white" alt="Python 3.7+">
-  <img src="https://img.shields.io/badge/modules-4%2F8%20done-brightgreen" alt="4 of 8 modules done">
+  <img src="https://img.shields.io/badge/modules-8%2F8%20done-brightgreen" alt="8 of 8 modules done">
   <img src="https://img.shields.io/badge/AI-assisted-8A2BE2" alt="AI assisted">
   <img src="https://img.shields.io/badge/vibes-immaculate-ff69b4" alt="Vibes: immaculate">
   <img src="https://img.shields.io/badge/dependencies-zero-success" alt="Zero dependencies">
@@ -32,23 +32,33 @@ AI-ASSISTED SCRIPTING
 
 This repository holds the hands-on labs for the **AI Assisted Scripting: Low-code Pathway**. You will use AI tools to write, improve, test and document small Python automations, then check your work against the exercise guide.
 
+It also has a small web site that puts the optional weather and postcode tasks on one page, next to the Module 1-8 lab files.
+
 ---
 
 ## 🗺️ Module progress
 
-`Labs done  ██████████░░░░░░░░░░  50%  (4 of 8 modules)`
+`Labs done  ████████████████████  100%  (8 of 8 modules)`
 
 | Module | Topic | Status | Where to look |
 |---|---|---|---|
-| 1 | Tools walkthrough | ✅ No tasks | Trainer-led |
+| 1 | Tools walkthrough | 📝 Worksheet | [`Module-1 Lab/`](Module-1%20Lab/) |
 | 2 | Define an automation solution | 📝 Worksheet (write-up, no code) | [`Module-2 Lab/`](Module-2%20Lab/) |
 | 3 | Generate your first script | ✅ Done | [`Module-3 Lab/tv_show_search.py`](Module-3%20Lab/tv_show_search.py) |
 | 4 | Improve AI-generated code | ✅ Done | [`Module-4 Lab/improved_search.py`](Module-4%20Lab/improved_search.py) |
 | 5 | Retrieve TV show data from an API | ✅ Done | [`Module-5 Lab/`](Module-5%20Lab/) |
-| 6 | Externalise configuration | ⏳ Not in repo yet | Exercise guide, section 1.6 |
-| 7 | Test and break the automation | ⏳ Not in repo yet | Exercise guide, section 1.7 |
-| 8 | Prepare for workplace use | ⏳ Not in repo yet | Exercise guide, section 1.8 |
+| 6 | Externalise configuration | ✅ Done | [`Module-6 Lab/`](Module-6%20Lab/) |
+| 7 | Test and break the automation | ✅ Done | [`Module-7 Lab/test_log.md`](Module-7%20Lab/test_log.md) |
+| 8 | Prepare for workplace use | ✅ Done | [`Module-8 Lab/`](Module-8%20Lab/) |
 | Workshop | Football match monitor | ⏳ Not in repo yet | Exercise guide, section 2 |
+
+### Optional tasks
+
+| Task | Topic | Status | Where to look |
+|---|---|---|---|
+| 2 | Current weather for a location | ✅ Done | [`Optional-Task-2/`](Optional-Task-2/) |
+| 3 | UK postcode to GPS coordinates, offline | ✅ Done | [`Optional-Task-3/`](Optional-Task-3/) |
+| 4 | Split the Task 3 code across several files | ⏳ Not started | [`Optional/optional_tasks.md`](Optional/optional_tasks.md) |
 
 ---
 
@@ -64,10 +74,23 @@ This repository holds the hands-on labs for the **AI Assisted Scripting: Low-cod
 │   ├── Setup Task 3 - ...txt   # Create a GitHub account (use the VM!)
 │   ├── sales_messy.csv         # Original data, deliberately chaotic
 │   └── sales_clean.csv         # Cleaned version (see "Known issues")
-├── Module-2 Lab/               # Automation planning worksheet brief
+├── Module-1 Lab/               # Automation planning worksheet
+├── Module-2 Lab/               # Lab brief and automation worksheet
 ├── Module-3 Lab/               # Search script: welcome, prompt, summary
 ├── Module-4 Lab/               # AI-generated script, refactored for humans
-└── Module-5 Lab/               # TVMaze API script, with README and sample output
+├── Module-5 Lab/               # TVMaze API script, with README and sample output
+├── Module-6 Lab/               # TVMaze script that reads config.json
+├── Module-7 Lab/               # Test log for the TVMaze automation
+├── Module-8 Lab/               # Script with logging, automation.log and README
+├── Optional/                   # Optional tasks brief
+├── Optional-Task-2/            # Weather lookup (terminal script)
+├── Optional-Task-3/            # Postcode lookup (terminal script) and offline data
+│   ├── data/uk_postcodes.csv.gz    # Live UK postcodes and coordinates (ONS, May 2026)
+│   └── build_postcode_data.py      # Rebuilds the data file from the full ONS CSV
+└── web/                        # Web site: weather, postcodes and Modules 1-8
+    ├── server.py               # Standard-library server and JSON endpoints
+    ├── modules.py              # List of lab files the site may show
+    └── index.html              # React page (loaded from a CDN)
 ```
 
 ---
@@ -88,9 +111,38 @@ python3 "Module-4 Lab/improved_search.py"
 
 # Module 5: live TVMaze search (needs internet)
 cd "Module-5 Lab" && python3 tvmaze_search.py
+
+# Module 6: the same search, with settings read from config.json
+cd "Module-6 Lab" && python3 tvmaze_search.py
+
+# Module 8: the same search, with logging to automation.log
+cd "Module-8 Lab" && python3 tvmaze_search.py
+
+# Optional Task 2: current weather for a place (needs internet)
+python3 "Optional-Task-2/weather.py"
+
+# Optional Task 3: postcode to coordinates (works offline)
+python3 "Optional-Task-3/postcode_lookup.py"
 ```
 
-Module 5 has its own [README](Module-5%20Lab/README.md) with more detail.
+### Web site
+
+The site shows the weather and postcode tools on one page, and the Module 1-8 lab files on another.
+
+```bash
+cd web
+python3 server.py
+```
+
+Then open http://127.0.0.1:8000. To use another port, set `PORT`:
+
+```bash
+PORT=8001 python3 server.py
+```
+
+The page loads React from a CDN, and the weather panel needs internet access. The postcode panel works offline.
+
+Module 5 has its own [README](Module-5%20Lab/README.md) and Module 8 has one too, [Module-8 Lab/README.md](Module-8%20Lab/README.md).
 
 ---
 
@@ -104,6 +156,11 @@ Module 5 has its own [README](Module-5%20Lab/README.md) with more detail.
 | Module 4 output matches the original AI script | ✅ Pass |
 | Module 5 returns real shows from TVMaze | ✅ Pass |
 | Module 5 says "No rating" instead of crashing | ✅ Pass |
+| Module 7 test log: all five test cases pass | ✅ Pass |
+| Module 8 writes errors to `automation.log` | ✅ Pass |
+| Postcode lookup finds SW1A 1AA and rejects malformed input | ✅ Pass |
+| Site API returns weather and postcode results | ✅ Pass |
+| Site page renders correctly in a browser | 🤞 Unverified |
 | The AI never said "Certainly!" in the commit messages | 🤞 Unverified |
 
 ---
@@ -112,8 +169,12 @@ Module 5 has its own [README](Module-5%20Lab/README.md) with more detail.
 
 - **The sales data is still a bit messy.** `sales_clean.csv` has four blanks where the source data was missing a value: Quantity (ORD1006), Salesperson (ORD1019), Date (ORD1021) and Order_ID (last row). Order ORD1018 is also missing from the sequence. These are left blank on purpose rather than guessed.
 - **The Module 3 and Module 4 scripts simulate data.** They don't call a real service. That's intentional for those labs.
-- **Module 5 needs internet access** to call the TVMaze API.
-- **Module 2 is a worksheet, not code.** Its deliverable is a one-page document, and no template is included.
+- **Modules 5 to 8 and the weather task need internet access** to call TVMaze or Open-Meteo.
+- **Module 2 is a worksheet, not code.** The completed worksheet is in `Module-2 Lab/automation_worksheet.md`.
+- **The TVMaze search returns only about 10 matches,** so a broad term such as `comedy` may show nothing at a high minimum rating.
+- **The rating range isn't checked.** A minimum rating outside 0 to 10 shows "No shows found" rather than an error.
+- **Network failure in Module 8 isn't triggered in testing.** The error path is in the code, but the log has no example of it yet.
+- **The postcode data is about 16 MB.** It comes from the ONS National Statistics Postcode Lookup (May 2026), and it's stored in the repo so the postcode lookup works offline.
 
 ---
 
@@ -127,7 +188,7 @@ Module 5 has its own [README](Module-5%20Lab/README.md) with more detail.
 
 ## 📜 Licence and credits
 
-Course material is © QA Limited, from the *AI Assisted Scripting: Low-code Pathway*. The lab scripts in this repository were written as learning examples.
+Course material is © QA Limited, from the *AI Assisted Scripting: Low-code Pathway*. The lab scripts in this repository were written as learning examples. The postcode data is from the ONS, published under the Open Government Licence.
 
 > 🥠 *Fortune cookie says: your code will run. Eventually. Probably after one traceback.*
 

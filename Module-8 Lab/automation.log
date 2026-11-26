@@ -1,0 +1,11 @@
+2026-11-19 13:42:57,588 - INFO - Automation started.
+2026-11-19 13:42:57,588 - INFO - Loaded config from /Users/jaroslaw.klata/code/QA-module-4-day1/Module-8 Lab/config.json: search_term='comedy', minimum_rating=8
+2026-11-19 13:42:57,588 - INFO - Searching TVMaze for 'comedy'.
+2026-11-19 13:42:57,724 - INFO - TVMaze returned 10 shows; 0 met the minimum rating of 8.
+2026-11-19 13:42:57,724 - INFO - Automation completed.
+2026-11-19 13:42:57,823 - INFO - Automation started.
+2026-11-19 13:42:57,823 - ERROR - Configuration error: Configuration file not found: /tmp/m8_does_not_exist.json
+Create config.json in the same folder as this script.
+2026-11-19 13:42:57,925 - INFO - Automation started.
+2026-11-19 13:42:57,925 - INFO - Loaded config from /tmp/m8_empty.json: search_term='', minimum_rating=8
+2026-11-19 13:42:57,925 - ERROR - Search term is empty in config; no search was made.
