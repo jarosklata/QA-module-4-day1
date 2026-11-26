@@ -18,6 +18,9 @@ Uses only the Python standard library. Run it with:
 then open http://127.0.0.1:8000 in a browser. To use another port:
 
     PORT=8001 python3 server.py
+
+The server listens on 127.0.0.1 (this computer only) unless HOST is set. In a
+container, set HOST=0.0.0.0 so the site can be reached from outside.
 """
 
 import json
@@ -42,7 +45,7 @@ from modules import MODULES, allowed_paths  # noqa: E402
 from postcode_lookup import PostcodeError, PostcodeNotFound, load_postcodes, lookup_postcode  # noqa: E402
 from weather import WeatherError, get_weather_for_place  # noqa: E402
 
-HOST = "127.0.0.1"
+HOST = os.environ.get("HOST", "127.0.0.1")
 PORT = int(os.environ.get("PORT", "8000"))
 PAGE_PATH = WEB_DIR / "index.html"
 
