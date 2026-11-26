@@ -107,7 +107,7 @@ The task briefs are in [`Optional/optional_tasks.md`](Optional/optional_tasks.md
 │   ├── Optional-Task-4/        # The Task 3 lookup split into main, data and lookup files
 │   └── Optional-Task-5/        # Income tax calculator, tax_bands.json and tests
 │       └── workshop/           # Two-band part 1 and the part 2 brief
-└── web/                        # Web site: weather, postcodes, football and Modules 1-8
+└── web/                        # Web site: home, weather, postcodes, football and Modules 1-8
     ├── server.py               # Standard-library server and JSON endpoints
     ├── modules.py              # List of lab files the site may show
     └── index.html              # React page (loaded from a CDN)
@@ -159,7 +159,7 @@ The football monitor reads `config.json` in its folder, writes `football_report.
 
 ### Web site
 
-The site has three pages: weather and postcodes, a football match monitor, and the Module 1-8 lab files. The football page uses the part 8 code from the workshop.
+The site opens on a home page with the introduction from the top of this README, from the QA AIA banner through the line about the Module 1-8 lab files. The other pages are weather and postcodes, a football match monitor, the Module 1-8 lab files, and the module solutions. The football page uses the part 8 code from the workshop.
 
 ```bash
 cd web

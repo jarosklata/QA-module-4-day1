@@ -111,9 +111,13 @@ def get_weather_for_place(place):
     and unexpected responses (KeyError, ValueError) are left for the caller.
     """
     location = find_location(place)
-    current, units = get_current_weather(location["latitude"], location["longitude"])
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+    current, units = get_current_weather(latitude, longitude)
     return {
         "place": describe_place(location),
+        "latitude": latitude,
+        "longitude": longitude,
         "time": current["time"],
         "temperature": current["temperature_2m"],
         "temperature_unit": units["temperature_2m"],

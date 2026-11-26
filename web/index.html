@@ -4,6 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>QA module 4 Labs</title>
+  <script>
+    // Apply the saved theme before the page paints. "light" and "dark" are
+    // explicit choices; otherwise follow the operating system.
+    (function () {
+      try {
+        var saved = localStorage.getItem("qa-theme");
+        var theme = saved === "dark" || saved === "light"
+          ? saved
+          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
   <style>
     :root {
       --bg: #f4f6fa;
@@ -21,24 +36,26 @@
       --border: #d5dbe6;
       --code-bg: #eef1f7;
       --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --live: #067647;
+      --live-bg: #e8f8ef;
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #0f1420;
-        --card: #171f2e;
-        --side: #0a0f19;
-        --side-text: #e8ecf4;
-        --side-muted: #9aa5b8;
-        --side-active: #1c2740;
-        --text: #e8ecf4;
-        --muted: #9aa5b8;
-        --accent: #6ea8ff;
-        --accent-soft: #1f2f52;
-        --error: #ff8a80;
-        --border: #2c3648;
-        --code-bg: #111827;
-        --shadow: none;
-      }
+    :root[data-theme="dark"] {
+      --bg: #0f1420;
+      --card: #171f2e;
+      --side: #0a0f19;
+      --side-text: #e8ecf4;
+      --side-muted: #9aa5b8;
+      --side-active: #1c2740;
+      --text: #e8ecf4;
+      --muted: #9aa5b8;
+      --accent: #6ea8ff;
+      --accent-soft: #1f2f52;
+      --error: #ff8a80;
+      --border: #2c3648;
+      --code-bg: #111827;
+      --shadow: none;
+      --live: #6ce9a6;
+      --live-bg: #123224;
     }
     * { box-sizing: border-box; }
     body {
@@ -103,7 +120,13 @@
     .profile-role { font-size: 0.8rem; color: var(--side-muted); }
 
     .content { padding: 20px 24px 24px; min-width: 0; }
-    .topbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
     .clock { display: flex; flex-wrap: wrap; gap: 8px; }
     .clock-item {
       display: inline-flex;
@@ -160,6 +183,10 @@
       color: var(--text);
     }
     button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       padding: 10px 14px;
       font-size: 0.95rem;
       border: none;
@@ -168,9 +195,7 @@
       color: #fff;
       cursor: pointer;
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) button[type="submit"] { color: #0a0f19; }
-    }
+    :root[data-theme="dark"] button[type="submit"] { color: #0a0f19; }
     button:disabled { opacity: 0.6; cursor: default; }
     .error { color: var(--error); margin: 12px 0 0; }
     .result { margin-top: 16px; }
@@ -217,17 +242,145 @@
     .fact-label { color: var(--muted); font-size: 0.8rem; }
     .fact-value { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; }
     .fact-sub { color: var(--muted); font-size: 0.8rem; overflow-wrap: anywhere; }
+    a.fact { color: inherit; text-decoration: none; }
+    a.fact:hover { border-color: var(--accent); }
+
+    /* Theme switch, next to the clock */
+    .theme-switch {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .theme-switch button {
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.9rem;
+    }
+    .theme-switch button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+    }
+    :root[data-theme="dark"] .theme-switch button[aria-pressed="true"] { color: #0a0f19; }
+
+    /* Home page: the top of the README */
+    .home { max-width: 860px; }
+    .home-banner {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(0.42rem, 1.15vw, 0.68rem);
+      line-height: 1.15;
+      overflow-x: auto;
+      margin: 0;
+    }
+    .home-center { text-align: center; }
+    .robot { display: block; margin: 12px auto 0; max-width: 100%; height: auto; }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .badge {
+      color: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .home-quote { margin: 0 0 16px; color: var(--muted); }
+    .home p { margin: 0 0 12px; }
+    .home p:last-child { margin-bottom: 0; }
 
     /* Football page */
     .football-form { flex-wrap: wrap; align-items: flex-end; }
     .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; min-width: 0; }
-    .field label { color: var(--muted); font-size: 0.85rem; }
+    .field label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
     .match-list { list-style: none; margin: 8px 0 0; padding: 0; }
-    .match-list li { padding: 10px 0; border-top: 1px solid var(--border); }
-    .match-result { font-weight: 600; }
-    .match-status { color: var(--muted); font-size: 0.9rem; }
+    .match-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .match-ball {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .match-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .match-team { font-weight: 600; }
+    .match-score {
+      min-width: 1.6rem;
+      padding: 2px 8px;
+      text-align: center;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .match-vs {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-align: right;
+      max-width: 16rem;
+    }
+    .status-pill.live { background: var(--live-bg); color: var(--live); }
+    .empty-matches { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
 
-    /* Modules and solutions pages */
+    /* Modules and solutions pages: list on the left, open file on the right */
+    .files-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.15fr);
+      gap: 16px;
+      align-items: start;
+    }
     .module-list { display: grid; gap: 12px; }
     .module-card { padding: 16px 20px; }
     .module-card p { margin: 0 0 10px; color: var(--muted); }
@@ -242,7 +395,8 @@
       color: #fff;
       border-color: var(--accent);
     }
-    .viewer { margin-top: 20px; }
+    .viewer { margin-top: 0; position: sticky; top: 16px; }
+    .viewer pre { max-height: calc(100vh - 180px); }
     pre {
       background: var(--code-bg);
       border: 1px solid var(--border);
@@ -264,8 +418,11 @@
       .navlink { margin-bottom: 0; padding: 8px 10px; }
       .profile { margin-top: 12px; padding-top: 12px; }
       .content { padding: 16px; }
-      .topbar { justify-content: flex-start; }
-      .grid { grid-template-columns: 1fr; }
+      .topbar { justify-content: flex-start; flex-wrap: wrap; }
+      .grid, .files-layout { grid-template-columns: 1fr; }
+      .viewer { position: static; }
+      .match-card { align-items: flex-start; }
+      .status-pill { margin-left: auto; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
@@ -278,11 +435,11 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const ROUTES = ["tools", "football", "modules", "solutions"];
+    const ROUTES = ["home", "tools", "football", "modules", "solutions"];
 
     function currentRoute() {
       const name = window.location.hash.replace("#/", "");
-      return ROUTES.includes(name) ? name : "tools";
+      return ROUTES.includes(name) ? name : "home";
     }
 
     // Shared helper: fetch JSON and turn an error response into a thrown message.
@@ -344,6 +501,40 @@
       wind: <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />,
       latitude: <path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" />,
       longitude: <path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />,
+      sun: (
+        <>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </>
+      ),
+      moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />,
+      home: (
+        <>
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </>
+      ),
+      trophy: (
+        <>
+          <path d="M8 21h8M12 17v4" />
+          <path d="M7 4h10v5a5 5 0 0 1-10 0V4z" />
+          <path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3" />
+        </>
+      ),
+      users: (
+        <>
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </>
+      ),
+      flag: (
+        <>
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+          <line x1="4" y1="22" x2="4" y2="15" />
+        </>
+      ),
+      activity: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
     };
 
     function Icon({ name, size = 20, fill = false }) {
@@ -403,6 +594,10 @@
     // 51.50101 -> '51.50101° N'; -0.141563 -> '0.141563° W'
     function formatCoordinate(value, positive, negative) {
       return `${Math.abs(value)}° ${value >= 0 ? positive : negative}`;
+    }
+
+    function mapsUrl(latitude, longitude) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(latitude)},${encodeURIComponent(longitude)}`;
     }
 
     // The weather API sends the conditions as text, so pick an emoji from the words.
@@ -514,6 +709,21 @@
                   value={placeTime ? placeTime.time : weather.time}
                   sub={placeTime ? placeTime.date : undefined}
                 />
+                {weather.latitude != null && weather.longitude != null && (
+                  <a
+                    className="fact"
+                    href={mapsUrl(weather.latitude, weather.longitude)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="fact-icon"><Icon name="pin" size={20} /></div>
+                    <div>
+                      <div className="fact-label">Google Maps</div>
+                      <div className="fact-value">{weather.latitude}, {weather.longitude}</div>
+                      <div className="fact-sub">Opens in a new tab</div>
+                    </div>
+                  </a>
+                )}
               </div>
             </div>
           )}
@@ -600,6 +810,45 @@
       { code: "ita.1", name: "Italian Serie A" },
     ];
 
+    // 'scheduled' before kick-off, 'live' while the match is on, otherwise 'finished'.
+    function matchKind(match) {
+      const status = (match.status || "").toLowerCase();
+      if (!match.started) return "scheduled";
+      if (/(full time|final|\bft\b|after extra|penalt|postpon|cancel|abandon)/.test(status)) return "finished";
+      return "live";
+    }
+
+    function formatMatchday(text) {
+      const match = /^(\d{4})(\d{2})(\d{2})$/.exec(text || "");
+      if (!match) return text;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      return `${day} ${MONTHS[month - 1]} ${year}`;
+    }
+
+    function MatchCard({ match }) {
+      const kind = matchKind(match);
+      const icon = kind === "live" ? "activity" : kind === "finished" ? "flag" : "calendar";
+      const label = kind === "live" ? "Live" : kind === "finished" ? "Finished" : "Not started";
+      return (
+        <li className="match-card">
+          <div className="match-ball" title={label}><Icon name="football" size={20} /></div>
+          <div className="match-line">
+            <span className="match-team">{match.home_team}</span>
+            {match.started && <span className="match-score">{match.home_score}</span>}
+            <span className="match-vs">vs</span>
+            {match.started && <span className="match-score">{match.away_score}</span>}
+            <span className="match-team">{match.away_team}</span>
+          </div>
+          <div className={`status-pill ${kind}`}>
+            <Icon name={icon} size={14} />
+            {match.status}
+          </div>
+        </li>
+      );
+    }
+
     function FootballPage() {
       const [league, setLeague] = useState("sco.1");
       const [team, setTeam] = useState("");
@@ -637,7 +886,7 @@
             </p>
             <form className="football-form" onSubmit={search}>
               <div className="field">
-                <label htmlFor="league">League</label>
+                <label htmlFor="league"><Icon name="trophy" size={14} /> League</label>
                 <select id="league" value={league} onChange={(event) => setLeague(event.target.value)}>
                   {LEAGUES.map((item) => (
                     <option key={item.code} value={item.code}>{item.name}</option>
@@ -645,7 +894,7 @@
                 </select>
               </div>
               <div className="field">
-                <label htmlFor="team">Team (optional)</label>
+                <label htmlFor="team"><Icon name="users" size={14} /> Team (optional)</label>
                 <input
                   id="team"
                   value={team}
@@ -654,7 +903,7 @@
                 />
               </div>
               <div className="field">
-                <label htmlFor="date">Date (optional)</label>
+                <label htmlFor="date"><Icon name="calendar" size={14} /> Date (optional)</label>
                 <input
                   id="date"
                   type="date"
@@ -663,30 +912,37 @@
                 />
               </div>
               <button type="submit" disabled={loading}>
+                <Icon name="football" size={16} />
                 {loading ? "Loading..." : "Show matches"}
               </button>
             </form>
             {error && <p className="error" role="alert">{error}</p>}
             {result && (
               <div className="result">
-                <h2>{result.league}</h2>
-                <p className="muted">
-                  {result.team ? `Team: ${result.team}. ` : ""}
-                  {result.date ? "Selected date." : "Current matchday."}{" "}
-                  {result.matches.length} of {result.total} matches shown.
-                </p>
+                <div className="summary">
+                  <span className="chip"><Icon name="trophy" size={16} />{result.league}</span>
+                  <span className="chip"><Icon name="users" size={16} />{result.team || "All teams"}</span>
+                  <span className="chip">
+                    <Icon name="calendar" size={16} />
+                    {result.date ? formatMatchday(result.date) : "Current matchday"}
+                  </span>
+                  <span className="chip">
+                    <Icon name="football" size={16} />
+                    {result.matches.length} of {result.total}
+                  </span>
+                </div>
                 {result.matches.length === 0 ? (
-                  <p>
-                    No matches found{result.team ? ` for "${result.team}"` : ""}.
-                    {!result.date && " The API only returns the current matchday unless you pick a date."}
+                  <p className="empty-matches">
+                    <Icon name="flag" size={20} />
+                    <span>
+                      No matches found{result.team ? ` for "${result.team}"` : ""}.
+                      {!result.date && " The API only returns the current matchday unless you pick a date."}
+                    </span>
                   </p>
                 ) : (
                   <ul className="match-list">
                     {result.matches.map((match, index) => (
-                      <li key={index}>
-                        <div className="match-result">{match.result}</div>
-                        <div className="match-status">Status: {match.status}</div>
-                      </li>
+                      <MatchCard key={`${match.home_team}-${match.away_team}-${index}`} match={match} />
                     ))}
                   </ul>
                 )}
@@ -727,36 +983,41 @@
           <PageTitle icon={icon}>{title}</PageTitle>
           {intro && <p className="muted">{intro}</p>}
           {loadError && <p className="error" role="alert">{loadError}</p>}
-          <div className="module-list">
-            {modules.map((module) => (
-              <section className="card module-card" key={module.number}>
-                <h2>{prefix} {module.number}: {module.title}</h2>
-                <p>{module.topic}</p>
-                <div className="file-buttons">
-                  {module.files.map((item) => (
-                    <button
-                      key={item.path}
-                      type="button"
-                      aria-pressed={selected && selected.path === item.path}
-                      onClick={() => openFile(item)}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+          <div className="files-layout">
+            <div className="module-list">
+              {modules.map((module) => (
+                <section className="card module-card" key={module.number}>
+                  <h2>{prefix} {module.number}: {module.title}</h2>
+                  <p>{module.topic}</p>
+                  <div className="file-buttons">
+                    {module.files.map((item) => (
+                      <button
+                        key={item.path}
+                        type="button"
+                        aria-pressed={selected && selected.path === item.path}
+                        onClick={() => openFile(item)}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
 
-          {selected && (
             <section className="card viewer">
-              <h2>{selected.label}</h2>
-              <p className="muted">{selected.path}</p>
-              {fileError && <p className="error" role="alert">{fileError}</p>}
-              {!file && !fileError && <p className="muted">Loading...</p>}
-              {file && <pre>{file.content}</pre>}
+              {!selected && <p className="muted">Choose a file to show it here.</p>}
+              {selected && (
+                <>
+                  <h2>{selected.label}</h2>
+                  <p className="muted">{selected.path}</p>
+                  {fileError && <p className="error" role="alert">{fileError}</p>}
+                  {!file && !fileError && <p className="muted">Loading...</p>}
+                  {file && <pre>{file.content}</pre>}
+                </>
+              )}
             </section>
-          )}
+          </div>
         </>
       );
     }
@@ -777,8 +1038,90 @@
       );
     }
 
+    /* ---------- Home: the top of the README, through the Module 1-8 line ---------- */
+    const HOME_BANNER = ` ██████╗  █████╗            █████╗ ██╗ █████╗
+██╔═══██╗██╔══██╗          ██╔══██╗██║██╔══██╗
+██║   ██║███████║  ██████  ███████║██║███████║
+██║▄▄ ██║██╔══██║  ╚═════  ██╔══██║██║██╔══██║
+╚██████╔╝██║  ██║          ██║  ██║██║██║  ██║
+ ╚══▀▀═╝ ╚═╝  ╚═╝          ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝
+
+ __  __   ___   ____   _   _  _      _____     _  _
+|  \\/  | / _ \\ |  _ \\ | | | || |    | ____|   | || |
+| |\\/| || | | || | | || | | || |    |  _|     | || |_
+| |  | || |_| || |_| || |_| || |___ | |___    |__   _|
+|_|  |_| \\___/ |____/  \\___/ |_____||_____|      |_|
+
+AI-ASSISTED SCRIPTING`;
+
+    const ROBOT_SVG = `<svg class="robot" xmlns="http://www.w3.org/2000/svg" width="290" height="170" viewBox="0 0 290 170" role="img" aria-label="Robot mascot saying print hi"><line x1="80" y1="14" x2="80" y2="34" stroke="#2d4a3e" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="12" r="7" fill="#f2a65a"/><rect x="26" y="34" width="108" height="98" rx="20" fill="#8ccab0" stroke="#2d4a3e" stroke-width="4"/><circle cx="58" cy="72" r="12" fill="#2d4a3e"/><circle cx="102" cy="72" r="12" fill="#2d4a3e"/><circle cx="62" cy="68" r="4" fill="#ffffff"/><circle cx="106" cy="68" r="4" fill="#ffffff"/><path d="M56 104 Q80 122 104 104" fill="none" stroke="#2d4a3e" stroke-width="5" stroke-linecap="round"/><rect x="44" y="136" width="72" height="20" rx="7" fill="#f2a65a" stroke="#2d4a3e" stroke-width="3"/><path d="M146 24 H262 a6 6 0 0 1 6 6 V52 a6 6 0 0 1 -6 6 H160 L148 68 V58 H146 a6 6 0 0 1 -6 -6 V30 a6 6 0 0 1 6 -6 Z" fill="#ffffff" stroke="#2d4a3e" stroke-width="2.5"/><text x="154" y="46" font-family="Menlo, Consolas, monospace" font-size="13" fill="#2d4a3e">print("hi")</text></svg>`;
+
+    const HOME_BADGES = [
+      { label: "Python 3.9+", color: "#3776ab" },
+      { label: "8 of 8 modules done", color: "#2ea44f" },
+      { label: "AI assisted", color: "#8A2BE2" },
+      { label: "Vibes: immaculate", color: "#ff69b4" },
+      { label: "Zero dependencies", color: "#2ea44f" },
+    ];
+
+    function HomePage() {
+      return (
+        <>
+          <PageTitle icon="home">Home</PageTitle>
+          <section className="card home">
+            <pre className="home-banner">{HOME_BANNER}</pre>
+            <div className="home-center" dangerouslySetInnerHTML={{ __html: ROBOT_SVG }} />
+            <div className="badges">
+              {HOME_BADGES.map((badge) => (
+                <span key={badge.label} className="badge" style={{ background: badge.color }}>{badge.label}</span>
+              ))}
+            </div>
+            <p className="home-quote home-center">
+              <em>Scripts that work, mostly on the first try.</em>
+              <br />
+              Python, AI assistance, and a healthy amount of vibe coding.
+            </p>
+            <p>
+              This repository holds the hands-on labs for the <strong>AI Assisted Scripting: Low-code Pathway</strong>.
+              You will use AI tools to write, improve, test and document small Python automations, then check your
+              work against the exercise guide.
+            </p>
+            <p>
+              It also holds the Day 4 workshop (a football match monitor, built in stages), and a small web site
+              that puts the weather, postcode and football tools next to the Module 1-8 lab files.
+            </p>
+          </section>
+        </>
+      );
+    }
+
+    /* ---------- Light and dark theme ---------- */
+    function ThemeSwitch() {
+      const [theme, setTheme] = useState(
+        () => document.documentElement.getAttribute("data-theme") || "light"
+      );
+
+      function choose(next) {
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("qa-theme", next);
+        setTheme(next);
+      }
+
+      return (
+        <div className="theme-switch" role="group" aria-label="Colour theme">
+          <button type="button" aria-pressed={theme === "light"} onClick={() => choose("light")}>
+            <Icon name="sun" size={16} /> Light
+          </button>
+          <button type="button" aria-pressed={theme === "dark"} onClick={() => choose("dark")}>
+            <Icon name="moon" size={16} /> Dark
+          </button>
+        </div>
+      );
+    }
+
     /* ---------- Page shell with left navigation ---------- */
     const NAV = [
+      { route: "home", label: "Home", icon: "home" },
       { route: "tools", label: "Weather & postcodes", icon: "cloud" },
       { route: "football", label: "Football", icon: "football" },
       { route: "modules", label: "Modules 1-8", icon: "book" },
@@ -798,6 +1141,7 @@
       if (route === "modules") page = <ModulesPage />;
       else if (route === "solutions") page = <SolutionsPage />;
       else if (route === "football") page = <FootballPage />;
+      else if (route === "home") page = <HomePage />;
       else {
         page = (
           <>
@@ -836,7 +1180,10 @@
             </div>
           </aside>
           <main className="content">
-            <header className="topbar"><Clock /></header>
+            <header className="topbar">
+              <ThemeSwitch />
+              <Clock />
+            </header>
             {page}
           </main>
         </div>

@@ -141,7 +141,15 @@ class SiteRequestHandler(BaseHTTPRequestHandler):
             "date": date,
             "total": len(all_matches),
             "matches": [
-                {"result": m.result_text(), "status": m.status_text(), "started": m.started}
+                {
+                    "result": m.result_text(),
+                    "status": m.status_text(),
+                    "started": m.started,
+                    "home_team": m.home_team,
+                    "away_team": m.away_team,
+                    "home_score": m.home_score,
+                    "away_score": m.away_score,
+                }
                 for m in matches
             ],
         })
