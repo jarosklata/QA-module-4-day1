@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QA module 4 Labs</title>
+  <script>
+    // Apply the saved theme before the page paints. "light" and "dark" are
+    // explicit choices; otherwise follow the operating system.
+    (function () {
+      try {
+        var saved = localStorage.getItem("qa-theme");
+        var theme = saved === "dark" || saved === "light"
+          ? saved
+          : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #f4f6fa;
+      --card: #ffffff;
+      --side: #1f2a3d;
+      --side-text: #e8ecf4;
+      --side-muted: #9aa5b8;
+      --side-active: #2f4267;
+      --side-line: rgba(255, 255, 255, 0.12);
+      --text: #1d2330;
+      --muted: #5b6475;
+      --accent: #2563eb;
+      --accent-soft: #e6eefc;
+      --error: #b42318;
+      --border: #d5dbe6;
+      --code-bg: #eef1f7;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --live: #067647;
+      --live-bg: #e8f8ef;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1420;
+      --card: #171f2e;
+      --side: #0a0f19;
+      --side-text: #e8ecf4;
+      --side-muted: #9aa5b8;
+      --side-active: #1c2740;
+      --text: #e8ecf4;
+      --muted: #9aa5b8;
+      --accent: #6ea8ff;
+      --accent-soft: #1f2f52;
+      --error: #ff8a80;
+      --border: #2c3648;
+      --code-bg: #111827;
+      --shadow: none;
+      --live: #6ce9a6;
+      --live-bg: #123224;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.45;
+    }
+    svg { flex: none; }
+
+    /* Layout */
+    .app {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: var(--side);
+      color: var(--side-text);
+      padding: 24px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand { font-size: 1.15rem; margin: 0 0 20px 4px; }
+    .navlink {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--side-text);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+    .navlink svg { opacity: 0.8; }
+    .navlink:hover { background: var(--side-active); }
+    .navlink[aria-current="page"] { background: var(--side-active); font-weight: 600; }
+    .navlink[aria-current="page"] svg { opacity: 1; }
+
+    .profile {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 8px 4px;
+      border-top: 1px solid var(--side-line);
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #8b5cf6, #2563eb);
+      color: #fff;
+    }
+    .profile-name { font-weight: 600; line-height: 1.2; }
+    .profile-role { font-size: 0.8rem; color: var(--side-muted); }
+
+    .content { padding: 20px 24px 24px; min-width: 0; }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .clock { display: flex; flex-wrap: wrap; gap: 8px; }
+    .clock-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      box-shadow: var(--shadow);
+    }
+
+    h1.page-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      margin: 0 0 16px;
+    }
+    h1.page-title svg { color: var(--accent); }
+    h2 { font-size: 1.2rem; margin: 0 0 8px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 0;
+      box-shadow: var(--shadow);
+    }
+    .card-title { display: flex; align-items: center; gap: 10px; }
+    .card-title h2 { margin: 0; }
+    .card-title svg { color: var(--accent); }
+    .muted { color: var(--muted); margin: 0 0 12px; }
+
+    /* Forms */
+    form { display: flex; gap: 8px; }
+    input, select {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+    }
+    :root[data-theme="dark"] button[type="submit"] { color: #0a0f19; }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .error { color: var(--error); margin: 12px 0 0; }
+    .result { margin-top: 16px; }
+
+    /* Result heroes and fact tiles (weather, postcode) */
+    .hero { display: flex; align-items: center; gap: 16px; }
+    .hero h2 { margin: 0 0 2px; }
+    .hero .muted { margin: 0; }
+    .hero-emoji { font-size: 3rem; line-height: 1; }
+    .hero-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .fact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      min-width: 0;
+    }
+    .fact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .fact-label { color: var(--muted); font-size: 0.8rem; }
+    .fact-value { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; }
+    .fact-sub { color: var(--muted); font-size: 0.8rem; overflow-wrap: anywhere; }
+    a.maps-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    a.maps-button:hover { filter: brightness(1.08); }
+    .maps-coords { font-weight: 500; opacity: 0.92; }
+    :root[data-theme="dark"] a.maps-button { color: #0a0f19; }
+
+    /* Theme switch, next to the clock */
+    .theme-switch {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .theme-switch button {
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.9rem;
+    }
+    .theme-switch button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+    }
+    :root[data-theme="dark"] .theme-switch button[aria-pressed="true"] { color: #0a0f19; }
+
+    /* Home page: the top of the README, centred in the content area */
+    .home-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .home-page .page-title { justify-content: center; }
+    .home {
+      width: min(860px, 100%);
+      margin: 0 auto;
+      text-align: center;
+    }
+    .home-banner {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(0.42rem, 1.15vw, 0.68rem);
+      line-height: 1.15;
+      overflow-x: auto;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .home-center { text-align: center; }
+    .robot { display: block; margin: 12px auto 0; max-width: 100%; height: auto; }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .badge {
+      color: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .home-quote { margin: 0 0 16px; color: var(--muted); }
+    .home p { margin: 0 0 12px; }
+    .home p:last-child { margin-bottom: 0; }
+
+    /* Football page */
+    .football-form { flex-wrap: wrap; align-items: flex-end; }
+    .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; min-width: 0; }
+    .field label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    .match-list { list-style: none; margin: 8px 0 0; padding: 0; }
+    .match-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .match-ball {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .match-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .match-team { font-weight: 600; }
+    .match-score {
+      min-width: 1.6rem;
+      padding: 2px 8px;
+      text-align: center;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .match-vs {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-align: right;
+      max-width: 16rem;
+    }
+    .status-pill.live { background: var(--live-bg); color: var(--live); }
+    .empty-matches { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
+
+    /* Modules and solutions pages: list on the left, open file on the right */
+    .files-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.15fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .module-list { display: grid; gap: 12px; }
+    .module-card { padding: 16px 20px; }
+    .module-card p { margin: 0 0 10px; color: var(--muted); }
+    .file-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+    .file-buttons button {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .file-buttons button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .viewer { margin-top: 0; position: sticky; top: 16px; }
+    .viewer pre { max-height: calc(100vh - 180px); }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      overflow: auto;
+      max-height: 60vh;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.85rem;
+      margin: 8px 0 0;
+    }
+
+    @media (max-width: 760px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { padding: 12px 16px; position: static; height: auto; }
+      .brand { margin: 0 0 8px; font-size: 1rem; }
+      .sidebar nav { display: flex; gap: 8px; flex-wrap: wrap; }
+      .navlink { margin-bottom: 0; padding: 8px 10px; }
+      .profile { margin-top: 12px; padding-top: 12px; }
+      .content { padding: 16px; }
+      .topbar { justify-content: flex-start; flex-wrap: wrap; }
+      .grid, .files-layout { grid-template-columns: 1fr; }
+      .viewer { position: static; }
+      .match-card { align-items: flex-start; }
+      .status-pill { margin-left: auto; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const ROUTES = ["home", "tools", "football", "modules", "solutions"];
+
+    function currentRoute() {
+      const name = window.location.hash.replace("#/", "");
+      return ROUTES.includes(name) ? name : "home";
+    }
+
+    // Shared helper: fetch JSON and turn an error response into a thrown message.
+    async function getJson(url) {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Something went wrong.");
+      return data;
+    }
+
+    /* ---------- Icons (inline SVG, so nothing extra to load) ---------- */
+    const ICONS = {
+      cloud: <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />,
+      football: (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8l3.8 2.8-1.45 4.45h-4.7L8.2 10.8z" />
+          <path d="M12 8V2.5M15.8 10.8l5.2-1.7M14.35 15.25l3.2 4.4M9.65 15.25l-3.2 4.4M8.2 10.8L3 9.1" />
+        </>
+      ),
+      book: (
+        <>
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </>
+      ),
+      check: (
+        <>
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </>
+      ),
+      sparkle: (
+        <>
+          <path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z" />
+          <path d="M19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z" />
+        </>
+      ),
+      calendar: (
+        <>
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </>
+      ),
+      clock: (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </>
+      ),
+      pin: (
+        <>
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </>
+      ),
+      thermometer: <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />,
+      droplet: <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />,
+      wind: <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />,
+      latitude: <path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" />,
+      longitude: <path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />,
+      sun: (
+        <>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </>
+      ),
+      moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />,
+      home: (
+        <>
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </>
+      ),
+      trophy: (
+        <>
+          <path d="M8 21h8M12 17v4" />
+          <path d="M7 4h10v5a5 5 0 0 1-10 0V4z" />
+          <path d="M17 4h3v2a3 3 0 0 1-3 3M7 4H4v2a3 3 0 0 0 3 3" />
+        </>
+      ),
+      users: (
+        <>
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </>
+      ),
+      flag: (
+        <>
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+          <line x1="4" y1="22" x2="4" y2="15" />
+        </>
+      ),
+      activity: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
+    };
+
+    function Icon({ name, size = 20, fill = false }) {
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill={fill ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          {ICONS[name]}
+        </svg>
+      );
+    }
+
+    function PageTitle({ icon, children }) {
+      return (
+        <h1 className="page-title">
+          <Icon name={icon} size={26} />
+          {children}
+        </h1>
+      );
+    }
+
+    function Fact({ icon, label, value, sub }) {
+      return (
+        <div className="fact">
+          <div className="fact-icon"><Icon name={icon} size={20} /></div>
+          <div>
+            <div className="fact-label">{label}</div>
+            <div className="fact-value">{value}</div>
+            {sub && <div className="fact-sub">{sub}</div>}
+          </div>
+        </div>
+      );
+    }
+
+    /* ---------- Formatting helpers ---------- */
+    const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    // Open-Meteo gives the local time at the place as '2026-11-26T12:15'.
+    // Returns { date: 'Thu 26 Nov 2026', time: '12:15' }, or null if it isn't in that form.
+    function formatPlaceTime(text) {
+      const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(text || "");
+      if (!match) return null;
+      const [, year, month, day, hour, minute] = match.map(Number);
+      const weekday = WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+      return { date: `${weekday} ${day} ${MONTHS[month - 1]} ${year}`, time: `${match[4]}:${match[5]}` };
+    }
+
+    // 51.50101 -> '51.50101° N'; -0.141563 -> '0.141563° W'
+    function formatCoordinate(value, positive, negative) {
+      return `${Math.abs(value)}° ${value >= 0 ? positive : negative}`;
+    }
+
+    function mapsUrl(latitude, longitude) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(latitude)},${encodeURIComponent(longitude)}`;
+    }
+
+    function MapsButton({ latitude, longitude }) {
+      if (latitude == null || longitude == null) return null;
+      return (
+        <a
+          className="maps-button"
+          href={mapsUrl(latitude, longitude)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Icon name="pin" size={18} />
+          Open in Google Maps
+          <span className="maps-coords">{latitude}, {longitude}</span>
+        </a>
+      );
+    }
+
+    // The weather API sends the conditions as text, so pick an emoji from the words.
+    function weatherEmoji(conditions) {
+      const text = (conditions || "").toLowerCase();
+      if (text.includes("thunder")) return "⛈️";
+      if (text.includes("snow")) return "❄️";
+      if (text.includes("freezing")) return "🧊";
+      if (text.includes("shower")) return "🌦️";
+      if (text.includes("rain")) return "🌧️";
+      if (text.includes("drizzle")) return "🌦️";
+      if (text.includes("fog")) return "🌫️";
+      if (text.includes("overcast")) return "☁️";
+      if (text.includes("partly")) return "⛅";
+      if (text.includes("mainly clear")) return "🌤️";
+      if (text.includes("clear")) return "☀️";
+      return "🌡️";
+    }
+
+    /* ---------- Clock (top right) ---------- */
+    function Clock() {
+      const [now, setNow] = useState(new Date());
+
+      useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      const date = now
+        .toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })
+        .replace(",", "");
+      const time = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+      return (
+        <div className="clock" aria-label="Current date and time">
+          <span className="clock-item"><Icon name="calendar" size={16} />{date}</span>
+          <span className="clock-item"><Icon name="clock" size={16} />{time}</span>
+        </div>
+      );
+    }
+
+    /* ---------- Weather (Optional Task 2) ---------- */
+    function WeatherPanel() {
+      const [place, setPlace] = useState("");
+      const [weather, setWeather] = useState(null);
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      async function search(event) {
+        event.preventDefault();
+        const trimmed = place.trim();
+        setWeather(null);
+        setError("");
+        if (!trimmed) {
+          setError("Enter a place name.");
+          return;
+        }
+        setLoading(true);
+        try {
+          setWeather(await getJson(`/api/weather?place=${encodeURIComponent(trimmed)}`));
+        } catch (err) {
+          setError(err.message || "Could not reach the server.");
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      const placeTime = weather ? formatPlaceTime(weather.time) : null;
+
+      return (
+        <section className="card">
+          <div className="card-title">
+            <Icon name="cloud" size={22} />
+            <h2>Weather</h2>
+          </div>
+          <p className="muted">Current weather for a place, from Open-Meteo.</p>
+          <form onSubmit={search}>
+            <input
+              value={place}
+              onChange={(event) => setPlace(event.target.value)}
+              placeholder="e.g. London"
+              aria-label="Place name"
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? "Searching..." : "Search"}
+            </button>
+          </form>
+          {error && <p className="error" role="alert">{error}</p>}
+          {weather && (
+            <div className="result">
+              <div className="hero">
+                <div className="hero-emoji" aria-hidden="true">{weatherEmoji(weather.conditions)}</div>
+                <div>
+                  <h2>{weather.place}</h2>
+                  <p className="muted">{weather.conditions}</p>
+                </div>
+              </div>
+              <div className="facts">
+                <Fact
+                  icon="thermometer"
+                  label="Temperature"
+                  value={`${weather.temperature} ${weather.temperature_unit}`}
+                />
+                <Fact icon="droplet" label="Humidity" value={`${weather.humidity} ${weather.humidity_unit}`} />
+                <Fact icon="wind" label="Wind speed" value={`${weather.wind_speed} ${weather.wind_speed_unit}`} />
+                <Fact
+                  icon="clock"
+                  label="Local time"
+                  value={placeTime ? placeTime.time : weather.time}
+                  sub={placeTime ? placeTime.date : undefined}
+                />
+              </div>
+              <MapsButton latitude={weather.latitude} longitude={weather.longitude} />
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    /* ---------- Postcodes (Optional Task 3) ---------- */
+    function PostcodePanel() {
+      const [code, setCode] = useState("");
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      async function search(event) {
+        event.preventDefault();
+        setResult(null);
+        setError("");
+        setLoading(true);
+        try {
+          setResult(await getJson(`/api/postcode?code=${encodeURIComponent(code)}`));
+        } catch (err) {
+          setError(err.message || "Could not reach the server.");
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      return (
+        <section className="card">
+          <div className="card-title">
+            <Icon name="pin" size={22} />
+            <h2>UK postcode</h2>
+          </div>
+          <p className="muted">GPS coordinates, looked up offline from the ONS postcode list.</p>
+          <form onSubmit={search}>
+            <input
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              placeholder="e.g. SW1A 1AA"
+              aria-label="UK postcode"
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? "Searching..." : "Find"}
+            </button>
+          </form>
+          {error && <p className="error" role="alert">{error}</p>}
+          {result && (
+            <div className="result">
+              <div className="hero">
+                <div className="hero-badge"><Icon name="pin" size={28} /></div>
+                <div>
+                  <h2>{result.postcode}</h2>
+                  <p className="muted">United Kingdom</p>
+                </div>
+              </div>
+              <div className="facts">
+                <Fact
+                  icon="latitude"
+                  label="Latitude"
+                  value={formatCoordinate(result.latitude, "N", "S")}
+                  sub={`${result.latitude} decimal`}
+                />
+                <Fact
+                  icon="longitude"
+                  label="Longitude"
+                  value={formatCoordinate(result.longitude, "E", "W")}
+                  sub={`${result.longitude} decimal`}
+                />
+              </div>
+              <MapsButton latitude={result.latitude} longitude={result.longitude} />
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    /* ---------- Football match monitor (Day 4 workshop) ---------- */
+    const LEAGUES = [
+      { code: "sco.1", name: "Scottish Premiership" },
+      { code: "eng.1", name: "English Premier League" },
+      { code: "fra.1", name: "French Ligue 1" },
+      { code: "ger.1", name: "German Bundesliga" },
+      { code: "esp.1", name: "Spanish La Liga" },
+      { code: "ita.1", name: "Italian Serie A" },
+    ];
+
+    // 'scheduled' before kick-off, 'live' while the match is on, otherwise 'finished'.
+    function matchKind(match) {
+      const status = (match.status || "").toLowerCase();
+      if (!match.started) return "scheduled";
+      if (/(full time|final|\bft\b|after extra|penalt|postpon|cancel|abandon)/.test(status)) return "finished";
+      return "live";
+    }
+
+    function formatMatchday(text) {
+      const match = /^(\d{4})(\d{2})(\d{2})$/.exec(text || "");
+      if (!match) return text;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      return `${day} ${MONTHS[month - 1]} ${year}`;
+    }
+
+    function MatchCard({ match }) {
+      const kind = matchKind(match);
+      const icon = kind === "live" ? "activity" : kind === "finished" ? "flag" : "calendar";
+      const label = kind === "live" ? "Live" : kind === "finished" ? "Finished" : "Not started";
+      return (
+        <li className="match-card">
+          <div className="match-ball" title={label}><Icon name="football" size={20} /></div>
+          <div className="match-line">
+            <span className="match-team">{match.home_team}</span>
+            {match.started && <span className="match-score">{match.home_score}</span>}
+            <span className="match-vs">vs</span>
+            {match.started && <span className="match-score">{match.away_score}</span>}
+            <span className="match-team">{match.away_team}</span>
+          </div>
+          <div className={`status-pill ${kind}`}>
+            <Icon name={icon} size={14} />
+            {match.status}
+          </div>
+        </li>
+      );
+    }
+
+    function FootballPage() {
+      const [league, setLeague] = useState("sco.1");
+      const [team, setTeam] = useState("");
+      const [date, setDate] = useState(""); // YYYY-MM-DD from the date picker
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      async function search(event) {
+        event.preventDefault();
+        setResult(null);
+        setError("");
+        setLoading(true);
+        const params = new URLSearchParams({
+          league,
+          team: team.trim(),
+          date: date.replace(/-/g, ""),
+        });
+        try {
+          setResult(await getJson(`/api/football?${params}`));
+        } catch (err) {
+          setError(err.message || "Could not reach the server.");
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      return (
+        <>
+          <PageTitle icon="football">Football match monitor</PageTitle>
+          <section className="card">
+            <p className="muted">
+              Fixtures and results from the ESPN Football API. Leave the date empty for the
+              current matchday, or pick a date to see earlier results.
+            </p>
+            <form className="football-form" onSubmit={search}>
+              <div className="field">
+                <label htmlFor="league"><Icon name="trophy" size={14} /> League</label>
+                <select id="league" value={league} onChange={(event) => setLeague(event.target.value)}>
+                  {LEAGUES.map((item) => (
+                    <option key={item.code} value={item.code}>{item.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="team"><Icon name="users" size={14} /> Team (optional)</label>
+                <input
+                  id="team"
+                  value={team}
+                  onChange={(event) => setTeam(event.target.value)}
+                  placeholder="e.g. Celtic"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="date"><Icon name="calendar" size={14} /> Date (optional)</label>
+                <input
+                  id="date"
+                  type="date"
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                />
+              </div>
+              <button type="submit" disabled={loading}>
+                <Icon name="football" size={16} />
+                {loading ? "Loading..." : "Show matches"}
+              </button>
+            </form>
+            {error && <p className="error" role="alert">{error}</p>}
+            {result && (
+              <div className="result">
+                <div className="summary">
+                  <span className="chip"><Icon name="trophy" size={16} />{result.league}</span>
+                  <span className="chip"><Icon name="users" size={16} />{result.team || "All teams"}</span>
+                  <span className="chip">
+                    <Icon name="calendar" size={16} />
+                    {result.date ? formatMatchday(result.date) : "Current matchday"}
+                  </span>
+                  <span className="chip">
+                    <Icon name="football" size={16} />
+                    {result.matches.length} of {result.total}
+                  </span>
+                </div>
+                {result.matches.length === 0 ? (
+                  <p className="empty-matches">
+                    <Icon name="flag" size={20} />
+                    <span>
+                      No matches found{result.team ? ` for "${result.team}"` : ""}.
+                      {!result.date && " The API only returns the current matchday unless you pick a date."}
+                    </span>
+                  </p>
+                ) : (
+                  <ul className="match-list">
+                    {result.matches.map((match, index) => (
+                      <MatchCard key={`${match.home_team}-${match.away_team}-${index}`} match={match} />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+        </>
+      );
+    }
+
+    /* ---------- Modules 1-8 and module solutions (same layout, different list) ---------- */
+    function FilesPage({ icon, title, intro, listUrl, prefix }) {
+      const [modules, setModules] = useState([]);
+      const [loadError, setLoadError] = useState("");
+      const [selected, setSelected] = useState(null); // {path, label}
+      const [file, setFile] = useState(null);         // {path, content}
+      const [fileError, setFileError] = useState("");
+
+      useEffect(() => {
+        getJson(listUrl)
+          .then(setModules)
+          .catch((err) => setLoadError(err.message));
+      }, [listUrl]);
+
+      async function openFile(item) {
+        setSelected(item);
+        setFile(null);
+        setFileError("");
+        try {
+          setFile(await getJson(`/api/module-file?path=${encodeURIComponent(item.path)}`));
+        } catch (err) {
+          setFileError(err.message);
+        }
+      }
+
+      return (
+        <>
+          <PageTitle icon={icon}>{title}</PageTitle>
+          {intro && <p className="muted">{intro}</p>}
+          {loadError && <p className="error" role="alert">{loadError}</p>}
+          <div className="files-layout">
+            <div className="module-list">
+              {modules.map((module) => (
+                <section className="card module-card" key={module.number}>
+                  <h2>{prefix} {module.number}: {module.title}</h2>
+                  <p>{module.topic}</p>
+                  <div className="file-buttons">
+                    {module.files.map((item) => (
+                      <button
+                        key={item.path}
+                        type="button"
+                        aria-pressed={selected && selected.path === item.path}
+                        onClick={() => openFile(item)}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            <section className="card viewer">
+              {!selected && <p className="muted">Choose a file to show it here.</p>}
+              {selected && (
+                <>
+                  <h2>{selected.label}</h2>
+                  <p className="muted">{selected.path}</p>
+                  {fileError && <p className="error" role="alert">{fileError}</p>}
+                  {!file && !fileError && <p className="muted">Loading...</p>}
+                  {file && <pre>{file.content}</pre>}
+                </>
+              )}
+            </section>
+          </div>
+        </>
+      );
+    }
+
+    function ModulesPage() {
+      return <FilesPage icon="book" title="Modules 1-8" listUrl="/api/modules" prefix="Module" />;
+    }
+
+    function SolutionsPage() {
+      return (
+        <FilesPage
+          icon="check"
+          title="Module solutions"
+          intro="From the exercise guide, section 3. The numbering follows the guide, so Solution 1 answers the guide's Module 2 lab, Solution 2 answers Module 3, and so on."
+          listUrl="/api/solutions"
+          prefix="Solution"
+        />
+      );
+    }
+
+    /* ---------- Home: the top of the README, through the Module 1-8 line ---------- */
+    const HOME_BANNER = ` ██████╗  █████╗            █████╗ ██╗ █████╗
+██╔═══██╗██╔══██╗          ██╔══██╗██║██╔══██╗
+██║   ██║███████║  ██████  ███████║██║███████║
+██║▄▄ ██║██╔══██║  ╚═════  ██╔══██║██║██╔══██║
+╚██████╔╝██║  ██║          ██║  ██║██║██║  ██║
+ ╚══▀▀═╝ ╚═╝  ╚═╝          ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝
+
+ __  __   ___   ____   _   _  _      _____     _  _
+|  \\/  | / _ \\ |  _ \\ | | | || |    | ____|   | || |
+| |\\/| || | | || | | || | | || |    |  _|     | || |_
+| |  | || |_| || |_| || |_| || |___ | |___    |__   _|
+|_|  |_| \\___/ |____/  \\___/ |_____||_____|      |_|
+
+AI-ASSISTED SCRIPTING`;
+
+    const ROBOT_SVG = `<svg class="robot" xmlns="http://www.w3.org/2000/svg" width="290" height="170" viewBox="0 0 290 170" role="img" aria-label="Robot mascot saying print hi"><line x1="80" y1="14" x2="80" y2="34" stroke="#2d4a3e" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="12" r="7" fill="#f2a65a"/><rect x="26" y="34" width="108" height="98" rx="20" fill="#8ccab0" stroke="#2d4a3e" stroke-width="4"/><circle cx="58" cy="72" r="12" fill="#2d4a3e"/><circle cx="102" cy="72" r="12" fill="#2d4a3e"/><circle cx="62" cy="68" r="4" fill="#ffffff"/><circle cx="106" cy="68" r="4" fill="#ffffff"/><path d="M56 104 Q80 122 104 104" fill="none" stroke="#2d4a3e" stroke-width="5" stroke-linecap="round"/><rect x="44" y="136" width="72" height="20" rx="7" fill="#f2a65a" stroke="#2d4a3e" stroke-width="3"/><path d="M146 24 H262 a6 6 0 0 1 6 6 V52 a6 6 0 0 1 -6 6 H160 L148 68 V58 H146 a6 6 0 0 1 -6 -6 V30 a6 6 0 0 1 6 -6 Z" fill="#ffffff" stroke="#2d4a3e" stroke-width="2.5"/><text x="154" y="46" font-family="Menlo, Consolas, monospace" font-size="13" fill="#2d4a3e">print("hi")</text></svg>`;
+
+    const HOME_BADGES = [
+      { label: "Python 3.9+", color: "#3776ab" },
+      { label: "8 of 8 modules done", color: "#2ea44f" },
+      { label: "AI assisted", color: "#8A2BE2" },
+      { label: "Vibes: immaculate", color: "#ff69b4" },
+      { label: "Zero dependencies", color: "#2ea44f" },
+    ];
+
+    function HomePage() {
+      return (
+        <div className="home-page">
+          <PageTitle icon="home">Home</PageTitle>
+          <section className="card home">
+            <pre className="home-banner">{HOME_BANNER}</pre>
+            <div className="home-center" dangerouslySetInnerHTML={{ __html: ROBOT_SVG }} />
+            <div className="badges">
+              {HOME_BADGES.map((badge) => (
+                <span key={badge.label} className="badge" style={{ background: badge.color }}>{badge.label}</span>
+              ))}
+            </div>
+            <p className="home-quote home-center">
+              <em>Scripts that work, mostly on the first try.</em>
+              <br />
+              Python, AI assistance, and a healthy amount of vibe coding.
+            </p>
+            <p>
+              This repository holds the hands-on labs for the <strong>AI Assisted Scripting: Low-code Pathway</strong>.
+              You will use AI tools to write, improve, test and document small Python automations, then check your
+              work against the exercise guide.
+            </p>
+            <p>
+              It also holds the Day 4 workshop (a football match monitor, built in stages), and a small web site
+              that puts the weather, postcode and football tools next to the Module 1-8 lab files.
+            </p>
+          </section>
+        </div>
+      );
+    }
+
+    /* ---------- Light and dark theme ---------- */
+    function ThemeSwitch() {
+      const [theme, setTheme] = useState(
+        () => document.documentElement.getAttribute("data-theme") || "light"
+      );
+
+      function choose(next) {
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("qa-theme", next);
+        setTheme(next);
+      }
+
+      return (
+        <div className="theme-switch" role="group" aria-label="Colour theme">
+          <button type="button" aria-pressed={theme === "light"} onClick={() => choose("light")}>
+            <Icon name="sun" size={16} /> Light
+          </button>
+          <button type="button" aria-pressed={theme === "dark"} onClick={() => choose("dark")}>
+            <Icon name="moon" size={16} /> Dark
+          </button>
+        </div>
+      );
+    }
+
+    /* ---------- Page shell with left navigation ---------- */
+    const NAV = [
+      { route: "home", label: "Home", icon: "home" },
+      { route: "tools", label: "Weather & postcodes", icon: "cloud" },
+      { route: "football", label: "Football", icon: "football" },
+      { route: "modules", label: "Modules 1-8", icon: "book" },
+      { route: "solutions", label: "Module solutions", icon: "check" },
+    ];
+
+    function App() {
+      const [route, setRoute] = useState(currentRoute());
+
+      useEffect(() => {
+        const onChange = () => setRoute(currentRoute());
+        window.addEventListener("hashchange", onChange);
+        return () => window.removeEventListener("hashchange", onChange);
+      }, []);
+
+      let page;
+      if (route === "modules") page = <ModulesPage />;
+      else if (route === "solutions") page = <SolutionsPage />;
+      else if (route === "football") page = <FootballPage />;
+      else if (route === "home") page = <HomePage />;
+      else {
+        page = (
+          <>
+            <PageTitle icon="cloud">Weather &amp; postcodes</PageTitle>
+            <div className="grid">
+              <WeatherPanel />
+              <PostcodePanel />
+            </div>
+          </>
+        );
+      }
+
+      return (
+        <div className="app">
+          <aside className="sidebar">
+            <h1 className="brand">QA module 4 Labs</h1>
+            <nav>
+              {NAV.map((item) => (
+                <a
+                  key={item.route}
+                  className="navlink"
+                  href={`#/${item.route}`}
+                  aria-current={route === item.route ? "page" : undefined}
+                >
+                  <Icon name={item.icon} size={20} />
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <div className="profile">
+              <div className="avatar"><Icon name="sparkle" size={22} fill /></div>
+              <div>
+                <div className="profile-name">Jarek</div>
+                <div className="profile-role">AI-assisted scripting</div>
+              </div>
+            </div>
+          </aside>
+          <main className="content">
+            <header className="topbar">
+              <ThemeSwitch />
+              <Clock />
+            </header>
+            {page}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

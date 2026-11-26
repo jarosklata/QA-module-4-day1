@@ -1,0 +1,9 @@
+{
+  "note": "Example figures for practice. Check https://www.gov.uk/income-tax-rates for the current tax year.",
+  "bands": [
+    {"name": "Personal allowance", "up_to": 12570, "rate": 0.0},
+    {"name": "Basic rate", "up_to": 50270, "rate": 0.20},
+    {"name": "Higher rate", "up_to": 125140, "rate": 0.40},
+    {"name": "Additional rate", "up_to": null, "rate": 0.45}
+  ]
+}

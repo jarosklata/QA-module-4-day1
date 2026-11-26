@@ -1,0 +1,55 @@
+Football Match Monitor - test results
+Run: 2026-11-26 11:56
+Script: part8-documentation/football_monitor.py
+Python: 3.9.6
+
+The tests call the live ESPN API, so match counts depend on the day they are run.
+The valid team test uses date 20261121, because Celtic was not playing on the
+current matchday when these tests were written.
+
+TESTS
+-----
+1. Scottish league: PASS
+   Setup:    league "sco.1", no team filter
+   Expected: exit 0; report headed 'Scottish Premiership'
+   Actual:   exit 0; matches=5
+2. English league: PASS
+   Setup:    league "eng.1", no team filter
+   Expected: exit 0; report headed 'English Premier League'
+   Actual:   exit 0; matches=1
+3. Valid team: PASS
+   Setup:    league "sco.1", team "Celtic", date 20261121
+   Expected: exit 0; at least 1 match; every match involves Celtic
+   Actual:   exit 0; matches=1; ['Celtic 4 - 1 St Mirren']
+4. Invalid team: PASS
+   Setup:    league "sco.1", team "Nonexistent FC"
+   Expected: exit 0; 0 matches; 'No matches found.'
+   Actual:   exit 0; matches=0
+5. Missing configuration file: PASS
+   Setup:    config path does not exist
+   Expected: exit 1; 'Config file not found'
+   Actual:   exit 1; Error: Config file not found: /var/folders/c7/3zmm81md67g1mrmp82pc2hsc
+6. Unknown league (extra): PASS
+   Setup:    league "xyz.9"
+   Expected: exit 1; HTTP error message
+   Actual:   exit 1; Error: ESPN returned HTTP 400 for league 'xyz.9'.
+7. Invalid JSON in config (extra): PASS
+   Setup:    config file cut off mid-way
+   Expected: exit 1; 'not valid JSON'
+   Actual:   exit 1; Error: Config file is not valid JSON: Expecting property name enclosed
+8. Missing setting (extra): PASS
+   Setup:    config has no 'league'
+   Expected: exit 1; names the setting
+   Actual:   exit 1; Error: Config setting 'league' must be a non-empty text value.
+
+SUMMARY
+-------
+| Test | Pass/Fail |
+|---|---|
+| API returned data | Pass |
+| Report created | Pass |
+| Team filter worked | Pass |
+| Configuration loaded | Pass |
+| Log file written | Pass |
+
+8 of 8 tests passed.
