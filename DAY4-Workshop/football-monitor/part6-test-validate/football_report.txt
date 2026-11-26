@@ -1,0 +1,8 @@
+Football Match Monitor
+League: Scottish Premiership
+Team filter: Celtic
+Date: current matchday
+Generated: 2026-11-26 11:56
+Matches: 0
+
+No matches found.

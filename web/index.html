@@ -80,7 +80,7 @@
     }
     .muted { color: var(--muted); margin: 0 0 12px; }
     form { display: flex; gap: 8px; }
-    input {
+    input, select {
       flex: 1;
       min-width: 0;
       padding: 10px 12px;
@@ -112,6 +112,15 @@
     }
     dt { color: var(--muted); }
     dd { margin: 0; text-align: right; }
+
+    /* Football page */
+    .football-form { flex-wrap: wrap; align-items: flex-end; }
+    .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 180px; min-width: 0; }
+    .field label { color: var(--muted); font-size: 0.85rem; }
+    .match-list { list-style: none; margin: 8px 0 0; padding: 0; }
+    .match-list li { padding: 10px 0; border-top: 1px solid var(--border); }
+    .match-result { font-weight: 600; }
+    .match-status { color: var(--muted); font-size: 0.9rem; }
 
     /* Modules page */
     .module-list { display: grid; gap: 12px; }
@@ -163,7 +172,9 @@
     const { useState, useEffect } = React;
 
     function currentRoute() {
-      return window.location.hash === "#/modules" ? "modules" : "tools";
+      if (window.location.hash === "#/modules") return "modules";
+      if (window.location.hash === "#/football") return "football";
+      return "tools";
     }
 
     // Shared helper: fetch JSON and turn an error response into a thrown message.
@@ -282,6 +293,113 @@
       );
     }
 
+    /* ---------- Football match monitor (Day 4 workshop) ---------- */
+    const LEAGUES = [
+      { code: "sco.1", name: "Scottish Premiership" },
+      { code: "eng.1", name: "English Premier League" },
+      { code: "fra.1", name: "French Ligue 1" },
+      { code: "ger.1", name: "German Bundesliga" },
+      { code: "esp.1", name: "Spanish La Liga" },
+      { code: "ita.1", name: "Italian Serie A" },
+    ];
+
+    function FootballPage() {
+      const [league, setLeague] = useState("sco.1");
+      const [team, setTeam] = useState("");
+      const [date, setDate] = useState(""); // YYYY-MM-DD from the date picker
+      const [result, setResult] = useState(null);
+      const [error, setError] = useState("");
+      const [loading, setLoading] = useState(false);
+
+      async function search(event) {
+        event.preventDefault();
+        setResult(null);
+        setError("");
+        setLoading(true);
+        const params = new URLSearchParams({
+          league,
+          team: team.trim(),
+          date: date.replace(/-/g, ""),
+        });
+        try {
+          setResult(await getJson(`/api/football?${params}`));
+        } catch (err) {
+          setError(err.message || "Could not reach the server.");
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      return (
+        <>
+          <h1 className="page-title">Football match monitor</h1>
+          <section className="card">
+            <p className="muted">
+              Fixtures and results from the ESPN Football API. Leave the date empty for the
+              current matchday, or pick a date to see earlier results.
+            </p>
+            <form className="football-form" onSubmit={search}>
+              <div className="field">
+                <label htmlFor="league">League</label>
+                <select id="league" value={league} onChange={(event) => setLeague(event.target.value)}>
+                  {LEAGUES.map((item) => (
+                    <option key={item.code} value={item.code}>{item.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="team">Team (optional)</label>
+                <input
+                  id="team"
+                  value={team}
+                  onChange={(event) => setTeam(event.target.value)}
+                  placeholder="e.g. Celtic"
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="date">Date (optional)</label>
+                <input
+                  id="date"
+                  type="date"
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                />
+              </div>
+              <button type="submit" disabled={loading}>
+                {loading ? "Loading..." : "Show matches"}
+              </button>
+            </form>
+            {error && <p className="error" role="alert">{error}</p>}
+            {result && (
+              <div className="result">
+                <h2>{result.league}</h2>
+                <p className="muted">
+                  {result.team ? `Team: ${result.team}. ` : ""}
+                  {result.date ? "Selected date." : "Current matchday."}{" "}
+                  {result.matches.length} of {result.total} matches shown.
+                </p>
+                {result.matches.length === 0 ? (
+                  <p>
+                    No matches found{result.team ? ` for "${result.team}"` : ""}.
+                    {!result.date && " The API only returns the current matchday unless you pick a date."}
+                  </p>
+                ) : (
+                  <ul className="match-list">
+                    {result.matches.map((match, index) => (
+                      <li key={index}>
+                        <div className="match-result">{match.result}</div>
+                        <div className="match-status">Status: {match.status}</div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+        </>
+      );
+    }
+
     /* ---------- Modules 1-8 ---------- */
     function ModulesPage() {
       const [modules, setModules] = useState([]);
@@ -369,6 +487,13 @@
               </a>
               <a
                 className="navlink"
+                href="#/football"
+                aria-current={route === "football" ? "page" : undefined}
+              >
+                Football
+              </a>
+              <a
+                className="navlink"
                 href="#/modules"
                 aria-current={route === "modules" ? "page" : undefined}
               >
@@ -379,6 +504,8 @@
           <main className="content">
             {route === "modules" ? (
               <ModulesPage />
+            ) : route === "football" ? (
+              <FootballPage />
             ) : (
               <>
                 <h1 className="page-title">Weather &amp; postcodes</h1>

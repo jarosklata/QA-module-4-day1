@@ -5,7 +5,10 @@ Serves the single-page site (index.html) and these JSON endpoints:
 
     GET /api/weather?place=London       current weather (Optional Task 2)
     GET /api/postcode?code=SW1A 1AA     postcode coordinates (Optional Task 3)
-    GET /api/modules                    list of the Module 1-8 lab files
+    GET /api/football?league=sco.1&team=Celtic&date=20261121
+                                        football matches (Day 4 workshop);
+                                        team and date are optional
+    GET /api/modules                   list of the Module 1-8 lab files
     GET /api/module-file?path=...       text of one listed lab file
 
 Uses only the Python standard library. Run it with:
@@ -28,10 +31,13 @@ WEB_DIR = Path(__file__).resolve().parent
 REPO_DIR = WEB_DIR.parent
 
 # Import the task code from its own folders.
-sys.path.insert(0, str(REPO_DIR / "Optional-Task-2"))
-sys.path.insert(0, str(REPO_DIR / "Optional-Task-3"))
+sys.path.insert(0, str(REPO_DIR / "Optional" / "Optional-Task-2"))
+sys.path.insert(0, str(REPO_DIR / "Optional" / "Optional-Task-3"))
+sys.path.insert(0, str(REPO_DIR / "DAY4-Workshop" / "football-monitor" / "part8-documentation"))
 sys.path.insert(0, str(WEB_DIR))
 
+from football_monitor import ApiError as FootballApiError  # noqa: E402
+from football_monitor import fetch_scoreboard, filter_by_team, league_name, parse_matches  # noqa: E402
 from modules import MODULES, allowed_paths  # noqa: E402
 from postcode_lookup import PostcodeError, PostcodeNotFound, load_postcodes, lookup_postcode  # noqa: E402
 from weather import WeatherError, get_weather_for_place  # noqa: E402
@@ -54,6 +60,12 @@ class SiteRequestHandler(BaseHTTPRequestHandler):
             self.send_weather(query.get("place", [""])[0])
         elif parsed.path == "/api/postcode":
             self.send_postcode(query.get("code", [""])[0])
+        elif parsed.path == "/api/football":
+            self.send_football(
+                query.get("league", [""])[0].strip(),
+                query.get("team", [""])[0].strip(),
+                query.get("date", [""])[0].strip(),
+            )
         elif parsed.path == "/api/modules":
             self.send_json(200, MODULES)
         elif parsed.path == "/api/module-file":
@@ -96,6 +108,37 @@ class SiteRequestHandler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": str(error)})
         else:
             self.send_json(200, result)
+
+    def send_football(self, league, team, date):
+        if not league:
+            self.send_json(400, {"error": "Choose a league."})
+            return
+        if date and not (date.isdigit() and len(date) == 8):
+            self.send_json(400, {"error": "The date must be in the form YYYYMMDD."})
+            return
+
+        try:
+            data = fetch_scoreboard(league, date)
+            all_matches = parse_matches(data)
+            matches = filter_by_team(all_matches, team)
+            name = league_name(data, league)
+        except FootballApiError as error:
+            self.send_json(502, {"error": str(error)})
+            return
+        except (AttributeError, KeyError, TypeError):
+            self.send_json(502, {"error": "ESPN returned data in an unexpected format."})
+            return
+
+        self.send_json(200, {
+            "league": name,
+            "team": team,
+            "date": date,
+            "total": len(all_matches),
+            "matches": [
+                {"result": m.result_text(), "status": m.status_text(), "started": m.started}
+                for m in matches
+            ],
+        })
 
     def send_module_file(self, relative_path):
         if relative_path not in allowed_paths():

@@ -1,0 +1,7 @@
+2026-11-26 11:56:47,241 - INFO - Automation started.
+2026-11-26 11:56:47,241 - INFO - Loaded config from /Users/jaroslaw.klata/code/QA-module-4-day1/DAY4-Workshop/football-monitor/part8-documentation/config.json: league='sco.1', team_filter='Celtic', output_file='football_report.txt', date=''
+2026-11-26 11:56:47,404 - INFO - League selected: Scottish Premiership (sco.1).
+2026-11-26 11:56:47,406 - INFO - Processed 5 matches; 0 match the team filter.
+2026-11-26 11:56:47,406 - WARNING - No matches found for team 'Celtic'.
+2026-11-26 11:56:47,406 - INFO - Output file created: /Users/jaroslaw.klata/code/QA-module-4-day1/DAY4-Workshop/football-monitor/part8-documentation/football_report.txt
+2026-11-26 11:56:47,406 - INFO - Automation completed.
